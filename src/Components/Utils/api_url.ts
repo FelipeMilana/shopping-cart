@@ -1,1 +1,0 @@
-export const BASE_URL = "https://www.fruityvice.com/doc/index.html";
