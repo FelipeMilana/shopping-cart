@@ -1,26 +1,63 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import Cart from "./Components/Cart";
+import { CartModel, ProductModel } from "./Components/Models/models";
+import ProductCard from "./Components/ProductCard";
+import Data from "./data.json";
+
 
 function App() {
+
+  const products: ProductModel[] = Data;
+  const [cartProducts, setCartProducts] = useState<CartModel[]>([]);
+
+  const handleAdd = (product: ProductModel) => {
+    const findProduct = cartProducts.find(x => x.id === product.id);
+
+    if (findProduct) {
+      setCartProducts(cartProducts.map(x => x.id === product.id ? { ...findProduct, quantity: findProduct.quantity + 1 } : x));
+    }
+    else {
+      setCartProducts([...cartProducts, { ...product, quantity: 1 }]);
+    }
+  }
+
+  const handleRemove = (product: ProductModel) => {
+    const findProduct = cartProducts.find(x => x.id === product.id);
+
+    if (findProduct?.quantity === 1) {
+      setCartProducts(cartProducts.filter(x => x.id !== product.id));
+    } else {
+      if (findProduct) {
+        setCartProducts(cartProducts.map(x => x.id === product.id ? { ...findProduct, quantity: findProduct.quantity - 1 } : x));
+      }
+      else {
+        return;
+      }
+    }
+  }
+
+  const handleClean = () => {
+    setCartProducts([]);
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+
+    <div>
+      <Cart products={cartProducts} addProduct={handleAdd} removeProduct={handleRemove} cleanCart={handleClean} />
+      <div className="container">
+        <div className="row">
+          {products.map(p => (
+            <div key={p.id} className="col-sm-3">
+              <ProductCard product={p} addProduct={handleAdd} />
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
+
   );
+
+
 }
 
 export default App;
